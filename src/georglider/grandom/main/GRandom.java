@@ -61,14 +61,17 @@ public class GRandom {
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy MM dd HH mm ss");
                     LocalDateTime now = LocalDateTime.now();
                     System.out.println(dtf.format(now));
-
+/*
                     String pathbad = getClass().getResource("").getPath();
                     String path1 = pathbad.replace("file:/","");
                     String path2 = path1.replace(".jar","");
-                    String path = path2.replace("!/georglider/grandom/main/","");
+                    String path3 = path2.replace(":/",":\\");
+                    String path = path3.replace("!/georglider/grandom/main/","");
                     //new File(path + "/GRandom").mkdirs();
-
-                    File out = new File(path + "/GRandom/" + dtf.format(now) + ".txt");
+*/
+                    String path = "";
+                    new File(path + "\\GRandom").mkdirs();
+                    File out = new File(path + "\\GRandom\\" + dtf.format(now) + ".txt");
 
                     System.out.println(path);
                     for (int i = 1; i < int_q + 1; i++) {
@@ -80,7 +83,7 @@ public class GRandom {
                             fw.write(i + " = " + value + "\r\n");
                             fw.close();
                         } catch (Exception ex) {
-
+                            JOptionPane.showMessageDialog(null, (res.getString("UnableToTypeInFile")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
                         }
                     }
                     int openfldr = 0;
@@ -90,9 +93,9 @@ public class GRandom {
                     }
                     else if (openfldr == JOptionPane.YES_OPTION){
                     try {
-                    Desktop.getDesktop().open(new File(path+"/GRandom"));
+                    Desktop.getDesktop().open(new File(path+"\\GRandom\\"));
                     } catch (Exception ex) {
-
+                        JOptionPane.showMessageDialog(null, (res.getString("UnableToOpenFolder")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
                     }}
                 }
             }
