@@ -9,10 +9,8 @@ import java.awt.event.FocusEvent;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.Random;
-import java.util.ResourceBundle;
-
+import java.util.*;
+import java.util.Timer;
 
 public class GRandom {
     private JButton generateButton;
@@ -20,8 +18,12 @@ public class GRandom {
     private JTextField T_Max;
     private JPanel JP1;
     private JTextField Quantity;
+    private JProgressBar progress;
+    private JPanel JP_Progress;
+    private JPanel J_Main;
+    private JPanel JP2;
 
-    public static void main(String[]args){
+    public static void main(String[] args){
         ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang");
         //ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang_ru_RU");
         JFrame F = new JFrame(res.getString("GRandom"));
@@ -29,8 +31,9 @@ public class GRandom {
         F.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         F.pack();
         F.setVisible(true);
+        F.setResizable(false);
     }
-
+    public boolean generating;
     public GRandom() {
         ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang");
         //ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang_ru_RU");
@@ -57,27 +60,44 @@ public class GRandom {
                 if (min > max) {
                     System.out.println(res.getString("Error"));
                     JOptionPane.showMessageDialog(null, (res.getString("MinimumGreaterThanMaximum")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
-                } else {
+                } else if (int_q>2147483646) {
+                    System.out.println(res.getString("Error"));
+                    JOptionPane.showMessageDialog(null, (res.getString("JavaLimitationsQ")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
+                } else if (int_q<1) {
+                    JOptionPane.showMessageDialog(null, (res.getString("MinimalNumber")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
+                } else if (min<-2147483641) {
+                    JOptionPane.showMessageDialog(null, (res.getString("JavaLimitationsMin")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
+                } else if (min>2147483646) {
+                    JOptionPane.showMessageDialog(null, (res.getString("JavaLimitationsMax")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
+                } else if (max<-2147483641) {
+                    JOptionPane.showMessageDialog(null, (res.getString("JavaLimitationsMin")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
+                } else if (max>2147483646) {
+                    JOptionPane.showMessageDialog(null, (res.getString("JavaLimitationsMax")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
+                }
+                else {
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy MM dd HH mm ss");
                     LocalDateTime now = LocalDateTime.now();
                     System.out.println(dtf.format(now));
-/*
-                    String pathbad = getClass().getResource("").getPath();
-                    String path1 = pathbad.replace("file:/","");
-                    String path2 = path1.replace(".jar","");
-                    String path3 = path2.replace(":/",":\\");
-                    String path = path3.replace("!/georglider/grandom/main/","");
-                    //new File(path + "/GRandom").mkdirs();
-*/
+
                     String path = "";
                     new File(path + "\\GRandom").mkdirs();
                     File out = new File(path + "\\GRandom\\" + dtf.format(now) + ".txt");
 
                     System.out.println(path);
+
+                    Timer timer = new Timer();
+                    int update = int_q/1250;
+                    if (int_q>1250) {
+                        update = int_q/1250;
+                    }
+                    else {
+                        update = 50;
+                    }
+                    timer.schedule(new UpdatePercent(),0,update);
+                    boolean generating = false;
                     for (int i = 1; i < int_q + 1; i++) {
                         int value = min + R.nextInt(1 + max - min);
                         System.out.println(i + " = " + value);
-
                         try {
                             FileWriter fw = new FileWriter(out, true);
                             fw.write(i + " = " + value + "\r\n");
@@ -85,6 +105,14 @@ public class GRandom {
                         } catch (Exception ex) {
                             JOptionPane.showMessageDialog(null, (res.getString("UnableToTypeInFile")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
                         }
+                            generating=true;
+                            progress.setMaximum(int_q);
+                            progress.setValue(i);
+                        if (i==int_q) {
+                            generating=false;
+                            timer.cancel();
+                        }
+                        else {}
                     }
                     int openfldr = 0;
                     openfldr = JOptionPane.showConfirmDialog(null, (res.getString("OpenFolder")),(res.getString("NumbersGenerated")), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -100,6 +128,7 @@ public class GRandom {
                 }
             }
         });
+
         T_Max.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -121,4 +150,18 @@ public class GRandom {
                 T_Min.setText("");
             }
         });
+        class UpdatePercent extends TimerTask {
+            public void run() {
+                progress.update(progress.getGraphics());
+            }
     }}
+
+    public class UpdatePercent extends TimerTask {
+        public void run() {
+            if (generating=true) {
+                progress.update(progress.getGraphics());
+            }
+            else {}
+            }
+        }
+    }
