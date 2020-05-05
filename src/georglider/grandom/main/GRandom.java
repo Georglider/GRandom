@@ -23,6 +23,7 @@ public class GRandom {
     private JPanel J_Main;
     private JPanel JP2;
 
+
     public static void main(String[] args){
         ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang");
         //ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang_ru_RU");
@@ -32,6 +33,35 @@ public class GRandom {
         F.pack();
         F.setVisible(true);
         F.setResizable(false);
+
+        JMenuBar gmenu = new JMenuBar();
+
+        JMenu Mode = new JMenu("Режим");
+        JMenu Display = new JMenu("После генерации");
+        JMenu GenerateOptions = new JMenu("Опции для генерации");
+
+        gmenu.add(Mode);
+        gmenu.add(Display);
+        gmenu.add(GenerateOptions);
+
+        //M = Menu | D = Display | GO = GenerateOptions
+        JMenuItem Mnumbers = new JMenuItem("Генерировать числа");
+        JMenuItem Mstring = new JMenuItem("Генерировать заданные строки");
+
+        JMenuItem Ddefault = new JMenuItem("По умолчанию");
+        JMenuItem Dopen = new JMenuItem("Открыть файл");
+        JMenuItem Dshowhere = new JMenuItem("Показать здесь");
+
+        JMenuItem GOninclude = new JMenuItem("Не включать числа");
+
+        Mode.add(Mnumbers);
+        Mode.add(Mstring);
+        Display.add(Ddefault);
+        Display.add(Dopen);
+        Display.add(Dshowhere);
+        GenerateOptions.add(GOninclude);
+
+        F.setJMenuBar(gmenu);
     }
     public boolean generating;
     public GRandom() {
