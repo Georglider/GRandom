@@ -32,6 +32,7 @@ public class GRandom {
         F.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         F.pack();
         F.setVisible(true);
+        F.setSize(300,158);
         F.setResizable(false);
 
         JMenuBar gmenu = new JMenuBar();
@@ -44,15 +45,32 @@ public class GRandom {
         gmenu.add(Display);
         gmenu.add(GenerateOptions);
 
+        Icon dicon = new Icon() {
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+
+            }
+
+            @Override
+            public int getIconWidth() {
+                return 0;
+            }
+
+            @Override
+            public int getIconHeight() {
+                return 0;
+            }
+        };
+
         //M = Menu | D = Display | GO = GenerateOptions
-        JMenuItem Mnumbers = new JMenuItem("Генерировать числа");
-        JMenuItem Mstring = new JMenuItem("Генерировать заданные строки");
+        JRadioButtonMenuItem Mnumbers = new JRadioButtonMenuItem("Генерировать числа",dicon,true);
+        JRadioButtonMenuItem Mstring = new JRadioButtonMenuItem("Генерировать заданные строки");
 
-        JMenuItem Ddefault = new JMenuItem("По умолчанию");
-        JMenuItem Dopen = new JMenuItem("Открыть файл");
-        JMenuItem Dshowhere = new JMenuItem("Показать здесь");
+        JRadioButtonMenuItem Ddefault = new JRadioButtonMenuItem("По умолчанию",dicon,true);
+        JRadioButtonMenuItem Dopen = new JRadioButtonMenuItem("Открыть файл");
+        JRadioButtonMenuItem Dshowhere = new JRadioButtonMenuItem("Показать здесь");
 
-        JMenuItem GOninclude = new JMenuItem("Не включать числа");
+        JRadioButtonMenuItem GOninclude = new JRadioButtonMenuItem("Не включать числа");
 
         Mode.add(Mnumbers);
         Mode.add(Mstring);
