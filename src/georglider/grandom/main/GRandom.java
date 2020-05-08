@@ -22,6 +22,7 @@ public class GRandom {
     private JPanel JP_Progress;
     private JPanel J_Main;
     private JPanel JP2;
+    private JRadioButton radioButton1;
 
 
     public static void main(String[] args){
@@ -32,7 +33,7 @@ public class GRandom {
         F.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         F.pack();
         F.setVisible(true);
-        F.setSize(300,158);
+        F.setSize(300,163);
         F.setResizable(false);
 
         JMenuBar gmenu = new JMenuBar();
@@ -64,13 +65,19 @@ public class GRandom {
 
         //M = Menu | D = Display | GO = GenerateOptions
         JRadioButtonMenuItem Mnumbers = new JRadioButtonMenuItem("Генерировать числа",dicon,true);
+        Mnumbers.setActionCommand("Mnumbers");
         JRadioButtonMenuItem Mstring = new JRadioButtonMenuItem("Генерировать заданные строки");
+        Mstring.setActionCommand("Mstring");
 
         JRadioButtonMenuItem Ddefault = new JRadioButtonMenuItem("По умолчанию",dicon,true);
+        Ddefault.setActionCommand("Ddefault");
         JRadioButtonMenuItem Dopen = new JRadioButtonMenuItem("Открыть файл");
+        Dopen.setActionCommand("Dopen");
         JRadioButtonMenuItem Dshowhere = new JRadioButtonMenuItem("Показать здесь");
+        Dshowhere.setActionCommand("Dshowhere");
 
         JRadioButtonMenuItem GOninclude = new JRadioButtonMenuItem("Не включать числа");
+        Dshowhere.setActionCommand("GOninclude");
 
         Mode.add(Mnumbers);
         Mode.add(Mstring);
@@ -81,6 +88,9 @@ public class GRandom {
 
         F.setJMenuBar(gmenu);
     }
+    public boolean T_Min_active;
+    public boolean T_Max_active;
+    public boolean Quantity_active;
     public boolean generating;
     public GRandom() {
         ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang");
@@ -181,21 +191,30 @@ public class GRandom {
             @Override
             public void focusGained(FocusEvent e) {
                 super.focusGained(e);
-                T_Max.setText("");
+                if (T_Max_active==false) {
+                    T_Max.setText("");
+                    T_Max_active=true;
+                } else{}
             }
         });
         Quantity.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 super.focusGained(e);
-                Quantity.setText("");
+                if (Quantity_active==false) {
+                    Quantity.setText("");
+                    Quantity_active=true;
+                } else{}
             }
         });
         T_Min.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 super.focusGained(e);
-                T_Min.setText("");
+                if (T_Min_active==false) {
+                    T_Min.setText("");
+                    T_Min_active=true;
+                } else{}
             }
         });
         class UpdatePercent extends TimerTask {
