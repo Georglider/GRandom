@@ -5,7 +5,9 @@
     <constraints>
       <xy x="20" y="20" width="500" height="400"/>
     </constraints>
-    <properties/>
+    <properties>
+      <foreground color="-12828863"/>
+    </properties>
     <border type="none"/>
     <children>
       <grid id="51c22" binding="J_Main" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -13,7 +15,9 @@
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties/>
+        <properties>
+          <foreground color="-12828863"/>
+        </properties>
         <border type="none"/>
         <children>
           <component id="a5f3b" class="javax.swing.JButton" binding="generateButton" default-binding="true">
@@ -29,6 +33,7 @@
               <focusCycleRoot value="false"/>
               <focusPainted value="true"/>
               <focusable value="true"/>
+              <font size="16"/>
               <foreground color="-16777216"/>
               <name value="Generate"/>
               <opaque value="true"/>
@@ -44,7 +49,9 @@
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <foreground color="-12828863"/>
+            </properties>
             <border type="none"/>
             <children>
               <component id="7e2b9" class="javax.swing.JProgressBar" binding="progress">
