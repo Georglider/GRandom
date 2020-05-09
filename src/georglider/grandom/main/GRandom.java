@@ -7,12 +7,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Timer;
 
-public class GRandom {
+public class GRandom extends JFrame {
     private JButton generateButton;
     private JTextField T_Min;
     private JTextField T_Max;
@@ -22,33 +23,29 @@ public class GRandom {
     private JPanel JP_Progress;
     private JPanel J_Main;
     private JPanel JP2;
-    private JRadioButton radioButton1;
+    int seed;
 
-
-    public static void main(String[] args){
-        ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang");
-        //ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang_ru_RU");
-        JFrame F = new JFrame(res.getString("GRandom"));
-        F.setContentPane(new GRandom().JP1);
-        F.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        F.pack();
-        F.setVisible(true);
-        F.setSize(300,163);
-        F.setResizable(false);
-
-        JMenuBar gmenu = new JMenuBar();
-
-        JMenu Mode = new JMenu("Режим");
-        JMenu Display = new JMenu("После генерации");
-        JMenu GenerateOptions = new JMenu("Опции для генерации");
-
-        gmenu.add(Mode);
-        gmenu.add(Display);
-        gmenu.add(GenerateOptions);
-
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    GRandom frame = new GRandom();
+                    frame.setVisible(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    public boolean T_Min_active;
+    public boolean T_Max_active;
+    public boolean Quantity_active;
+    public boolean generating;
+    private Icon createIcon() {
         Icon dicon = new Icon() {
             @Override
-            public void paintIcon(Component c, Graphics g, int x, int y) {
+            public void paintIcon(Component c,
+                                  Graphics g, int x, int y) {
 
             }
 
@@ -63,21 +60,32 @@ public class GRandom {
             }
         };
 
-        //M = Menu | D = Display | GO = GenerateOptions
-        JRadioButtonMenuItem Mnumbers = new JRadioButtonMenuItem("Генерировать числа",dicon,true);
-        Mnumbers.setActionCommand("Mnumbers");
-        JRadioButtonMenuItem Mstring = new JRadioButtonMenuItem("Генерировать заданные строки");
-        Mstring.setActionCommand("Mstring");
+        return dicon;
+    }
+    public GRandom() {
+        ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang");
+        JFrame F = new JFrame(res.getString("GRandom"));
+        F.setContentPane(JP1);
+        F.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        F.pack();
+        F.setVisible(true);
+        F.setSize(300,163);
+        F.setResizable(false);
+        JMenuBar gmenu = new JMenuBar();
 
-        JRadioButtonMenuItem Ddefault = new JRadioButtonMenuItem("По умолчанию",dicon,true);
-        Ddefault.setActionCommand("Ddefault");
-        JRadioButtonMenuItem Dopen = new JRadioButtonMenuItem("Открыть файл");
-        Dopen.setActionCommand("Dopen");
-        JRadioButtonMenuItem Dshowhere = new JRadioButtonMenuItem("Показать здесь");
-        Dshowhere.setActionCommand("Dshowhere");
+        JMenu Mode = new JMenu((res.getString("Mode")));
+        JMenu Display = new JMenu((res.getString("Display")));
+        JMenu GenerateOptions = new JMenu((res.getString("GenerateOptions")));
 
-        JRadioButtonMenuItem GOninclude = new JRadioButtonMenuItem("Не включать числа");
-        Dshowhere.setActionCommand("GOninclude");
+        // M = Menu | D = Display | GO = GenerateOptions
+        JRadioButtonMenuItem Mnumbers = new JRadioButtonMenuItem((res.getString("Mnumbers")), createIcon(), true);
+        JRadioButtonMenuItem Mstring = new JRadioButtonMenuItem((res.getString("Mstring")));
+
+        JRadioButtonMenuItem Ddefault = new JRadioButtonMenuItem((res.getString("Ddefault")), createIcon(), true);
+        JRadioButtonMenuItem Dopen = new JRadioButtonMenuItem((res.getString("Dopen")));
+        JRadioButtonMenuItem Dshowhere = new JRadioButtonMenuItem((res.getString("Dshowhere")));
+
+        JRadioButtonMenuItem GOninclude = new JRadioButtonMenuItem((res.getString("GOninclude")));
 
         Mode.add(Mnumbers);
         Mode.add(Mstring);
@@ -86,14 +94,11 @@ public class GRandom {
         Display.add(Dshowhere);
         GenerateOptions.add(GOninclude);
 
+        gmenu.add(Mode);
+        gmenu.add(Display);
+        gmenu.add(GenerateOptions);
         F.setJMenuBar(gmenu);
-    }
-    public boolean T_Min_active;
-    public boolean T_Max_active;
-    public boolean Quantity_active;
-    public boolean generating;
-    public GRandom() {
-        ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang");
+
         //ResourceBundle res = ResourceBundle.getBundle("georglider.grandom.lang.lang_ru_RU");
         generateButton.setText(res.getString("GenerateTT"));
         generateButton.setToolTipText(res.getString("Generate"));
@@ -108,13 +113,18 @@ public class GRandom {
         UIManager.put("OptionPane.noButtonText", res.getString("No"));
         UIManager.put("OptionPane.cancelButtonText", res.getString("Cancel"));
 
+        //Seed list https://github.com/Georglider/GRandom/wiki/Seed-list
+
         generateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //Setting up seed
+                getSeed();
                 Random R = new Random();
                 int min = Integer.parseInt(T_Min.getText());
                 int max = Integer.parseInt(T_Max.getText());
                 int int_q = Integer.parseInt(Quantity.getText());
+
                 if (min > max) {
                     System.out.println(res.getString("Error"));
                     JOptionPane.showMessageDialog(null, (res.getString("MinimumGreaterThanMaximum")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
@@ -133,6 +143,7 @@ public class GRandom {
                     JOptionPane.showMessageDialog(null, (res.getString("JavaLimitationsMax")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
                 }
                 else {
+
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy MM dd HH mm ss");
                     LocalDateTime now = LocalDateTime.now();
                     System.out.println(dtf.format(now));
@@ -163,9 +174,9 @@ public class GRandom {
                         } catch (Exception ex) {
                             JOptionPane.showMessageDialog(null, (res.getString("UnableToTypeInFile")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
                         }
-                            generating=true;
-                            progress.setMaximum(int_q);
-                            progress.setValue(i);
+                        generating=true;
+                        progress.setMaximum(int_q);
+                        progress.setValue(i);
                         if (i==int_q) {
                             generating=false;
                             timer.cancel();
@@ -178,12 +189,65 @@ public class GRandom {
 
                     }
                     else if (openfldr == JOptionPane.YES_OPTION){
-                    try {
-                    Desktop.getDesktop().open(new File(path+"\\GRandom\\"));
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(null, (res.getString("UnableToOpenFolder")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
-                    }}
+                        try {
+                            Desktop.getDesktop().open(new File(path+"\\GRandom\\"));
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(null, (res.getString("UnableToOpenFolder")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
+                        }}
                 }
+            }
+            public void getSeed() {
+                //1 option chosen (6)
+                if (Mnumbers.isSelected()) { seed=1; }
+                if (Mstring.isSelected()) {seed=2;}
+                if (Ddefault.isSelected()) {seed=3;}
+                if (Dopen.isSelected()) {seed=4;}
+                if (Dshowhere.isSelected()) {seed=5;}
+                if (GOninclude.isSelected()) {seed=6;}
+                //2 options chosen (15)
+                if (Mnumbers.isSelected()&&Mstring.isSelected()) {seed=7;}
+                if (Mnumbers.isSelected()&&Ddefault.isSelected()) {seed=8;}
+                if (Mnumbers.isSelected()&&Dopen.isSelected()) {seed=9;}
+                if (Mnumbers.isSelected()&&Dshowhere.isSelected()) {seed=10;}
+                if (Mnumbers.isSelected()&&GOninclude.isSelected()) {seed=11;}
+                if (Mstring.isSelected()&&Ddefault.isSelected()) {seed=12;}
+                if (Mstring.isSelected()&&Ddefault.isSelected()) {seed=13;}
+                if (Mstring.isSelected()&&Dopen.isSelected()) {seed=14;}
+                if (Mstring.isSelected()&&Dshowhere.isSelected()) {seed=15;}
+                if (Mstring.isSelected()&&GOninclude.isSelected()) {seed=16;}
+                if (Ddefault.isSelected()&&Dopen.isSelected()) {seed=17;}
+                if (Ddefault.isSelected()&&Dshowhere.isSelected()) {seed=18;}
+                if (Ddefault.isSelected()&&GOninclude.isSelected()) {seed=19;}
+                if (Dopen.isSelected()&&Dshowhere.isSelected()) {seed=20;}
+                if (Dopen.isSelected()&&GOninclude.isSelected()) {seed=21;}
+                if (Dshowhere.isSelected()&&GOninclude.isSelected()) {seed=22;}
+                //3 Options chosen (9)
+                if (Mnumbers.isSelected()&&Mstring.isSelected()&&Ddefault.isSelected()) {seed=23;}
+                if (Mnumbers.isSelected()&&Mstring.isSelected()&&Dopen.isSelected()) {seed=24;}
+                if (Mnumbers.isSelected()&&Mstring.isSelected()&&Dshowhere.isSelected()) {seed=25;}
+                if (Mnumbers.isSelected()&&Mstring.isSelected()&&GOninclude.isSelected()) {seed=26;}
+                if (Mnumbers.isSelected()&&Dopen.isSelected()&&Ddefault.isSelected()) {seed=27;}
+                if (Mnumbers.isSelected()&&Dopen.isSelected()&&Dshowhere.isSelected()) {seed=28;}
+                if (Mnumbers.isSelected()&&Dopen.isSelected()&&GOninclude.isSelected()) {seed=29;}
+                if (Mnumbers.isSelected()&&Dshowhere.isSelected()&&GOninclude.isSelected()) {seed=30;}
+                if (Mnumbers.isSelected()&&Dshowhere.isSelected()&&Ddefault.isSelected()) {seed=31;}
+                if (Ddefault.isSelected()&&GOninclude.isSelected()&&Mnumbers.isSelected()) {seed=32;}
+                //4 Options chosen (12)
+                if (Mnumbers.isSelected()&&Mstring.isSelected()&&Ddefault.isSelected()&&Dopen.isSelected()) {seed=33;}
+                if (Mnumbers.isSelected()&&Mstring.isSelected()&&Ddefault.isSelected()&&Dshowhere.isSelected()) {seed=34;}
+                if (Mnumbers.isSelected()&&Mstring.isSelected()&&Ddefault.isSelected()&&GOninclude.isSelected()) {seed=35;}
+                if (Mnumbers.isSelected()&&Mstring.isSelected()&&Dopen.isSelected()&&Dshowhere.isSelected()) {seed=36;}
+                if (Mnumbers.isSelected()&&Mstring.isSelected()&&Dopen.isSelected()&&GOninclude.isSelected()) {seed=37;}
+                if (GOninclude.isSelected()&&Ddefault.isSelected()&&Dopen.isSelected()&&Mnumbers.isSelected()) {seed=38;}
+                if (GOninclude.isSelected()&&Dshowhere.isSelected()&&Dopen.isSelected()&&Mnumbers.isSelected()) {seed=39;}
+                if (GOninclude.isSelected()&&Dshowhere.isSelected()&&Ddefault.isSelected()&&Mnumbers.isSelected()) {seed=40;}
+                if (GOninclude.isSelected()&&Ddefault.isSelected()&&Dopen.isSelected()&&Mstring.isSelected()) {seed=41;}
+                if (GOninclude.isSelected()&&Dshowhere.isSelected()&&Dopen.isSelected()&&Mstring.isSelected()) {seed=42;}
+                if (GOninclude.isSelected()&&Dshowhere.isSelected()&&Ddefault.isSelected()&&Mstring.isSelected()) {seed=43;}
+                if (Dopen.isSelected()&&Dshowhere.isSelected()&&Ddefault.isSelected()&&Mstring.isSelected()) {seed=44;}
+                if (Dopen.isSelected()&&Dshowhere.isSelected()&&Ddefault.isSelected()&&Mnumbers.isSelected()) {seed=45;}
+
+                System.out.println("Seed: "+seed);
             }
         });
 
@@ -221,7 +285,7 @@ public class GRandom {
             public void run() {
                 progress.update(progress.getGraphics());
             }
-    }}
+        }}
 
     public class UpdatePercent extends TimerTask {
         public void run() {
@@ -229,6 +293,6 @@ public class GRandom {
                 progress.update(progress.getGraphics());
             }
             else {}
-            }
         }
     }
+}
