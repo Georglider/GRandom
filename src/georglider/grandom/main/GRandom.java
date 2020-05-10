@@ -1,6 +1,7 @@
 package georglider.grandom.main;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Timer;
+import java.awt.BorderLayout;
 
 public class GRandom extends JFrame {
     private JButton generateButton;
@@ -24,6 +26,11 @@ public class GRandom extends JFrame {
     private JPanel J_Main;
     private JPanel JP2;
     int seed;
+    int MassiveNumbers;
+    boolean GO_Used;
+    String[] DoNotGenerateSTR;
+    int[] DoNotGenerateINT;
+    int toCheckValue = 5;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -85,7 +92,7 @@ public class GRandom extends JFrame {
         JRadioButtonMenuItem Dopen = new JRadioButtonMenuItem((res.getString("Dopen")));
         JRadioButtonMenuItem Dshowhere = new JRadioButtonMenuItem((res.getString("Dshowhere")));
 
-        JRadioButtonMenuItem GOninclude = new JRadioButtonMenuItem((res.getString("GOninclude")));
+        JMenuItem GOninclude = new JMenuItem((res.getString("GOninclude")));
 
         Mode.add(Mnumbers);
         Mode.add(Mstring);
@@ -120,6 +127,17 @@ public class GRandom extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //Setting up seed
                 getSeed();
+                if (GO_Used==true) {
+                    System.out.println(MassiveNumbers);
+                    for(int i=0; i<MassiveNumbers; i++) {
+                        try {
+                        DoNotGenerateINT[i] = Integer.parseInt(DoNotGenerateSTR[i]);
+                        } catch (NumberFormatException nfe) {
+                            //NOTE: write something here if you need to recover from formatting errors
+                        };
+                    }
+                    //System.out.println(Arrays.toString(DoNotGenerateINT));
+                }
                 Random R = new Random();
                 int min = Integer.parseInt(T_Min.getText());
                 int max = Integer.parseInt(T_Max.getText());
@@ -142,7 +160,12 @@ public class GRandom extends JFrame {
                 } else if (max>2147483646) {
                     JOptionPane.showMessageDialog(null, (res.getString("JavaLimitationsMax")), (res.getString("Error")), JOptionPane.ERROR_MESSAGE);
                 }
-                else {
+                /*
+                try { check(DoNotGenerateINT, toCheckValue);
+                } catch (NumberFormatException nfe) {
+                    //NOTE: write something here if you need to recover from formatting errors
+                }; */
+                {
 
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy MM dd HH mm ss");
                     LocalDateTime now = LocalDateTime.now();
@@ -196,7 +219,9 @@ public class GRandom extends JFrame {
                         }}
                 }
             }
+
             public void getSeed() {
+                if (!Mnumbers.isSelected()&&!Mstring.isSelected()&&!Dopen.isSelected()&&!Dshowhere.isSelected()&&!Ddefault.isSelected()&&!GOninclude.isSelected()) { seed=0; }
                 //1 option chosen (6)
                 if (Mnumbers.isSelected()) { seed=1; }
                 if (Mstring.isSelected()) {seed=2;}
@@ -232,7 +257,7 @@ public class GRandom extends JFrame {
                 if (Mnumbers.isSelected()&&Dshowhere.isSelected()&&GOninclude.isSelected()) {seed=30;}
                 if (Mnumbers.isSelected()&&Dshowhere.isSelected()&&Ddefault.isSelected()) {seed=31;}
                 if (Ddefault.isSelected()&&GOninclude.isSelected()&&Mnumbers.isSelected()) {seed=32;}
-                //4 Options chosen (12)
+                //4 Options chosen (13)
                 if (Mnumbers.isSelected()&&Mstring.isSelected()&&Ddefault.isSelected()&&Dopen.isSelected()) {seed=33;}
                 if (Mnumbers.isSelected()&&Mstring.isSelected()&&Ddefault.isSelected()&&Dshowhere.isSelected()) {seed=34;}
                 if (Mnumbers.isSelected()&&Mstring.isSelected()&&Ddefault.isSelected()&&GOninclude.isSelected()) {seed=35;}
@@ -246,9 +271,31 @@ public class GRandom extends JFrame {
                 if (GOninclude.isSelected()&&Dshowhere.isSelected()&&Ddefault.isSelected()&&Mstring.isSelected()) {seed=43;}
                 if (Dopen.isSelected()&&Dshowhere.isSelected()&&Ddefault.isSelected()&&Mstring.isSelected()) {seed=44;}
                 if (Dopen.isSelected()&&Dshowhere.isSelected()&&Ddefault.isSelected()&&Mnumbers.isSelected()) {seed=45;}
+                if (Mstring.isSelected()&&Mnumbers.isSelected()&&Dshowhere.isSelected()&&GOninclude.isSelected()) {seed=46;}
 
                 System.out.println("Seed: "+seed);
             }
+           /* private void check(int[] DoNotGenerateINT, int toCheckValue)
+            {
+                // check if the specified element
+                // is present in the array or not
+                // using Linear Search method
+                boolean test = false;
+                try {
+                for (int element : DoNotGenerateINT) {
+                    if (element == toCheckValue) {
+                        test = true;
+                        break;
+                    }
+                }
+                } catch (NumberFormatException nfe) {
+                    //NOTE: write something here if you need to recover from formatting errors
+                };
+
+                // Print the result
+                System.out.println("Is " + toCheckValue
+                        + " present in the array: " + test);
+            } */
         });
 
         T_Max.addFocusListener(new FocusAdapter() {
@@ -279,6 +326,58 @@ public class GRandom extends JFrame {
                     T_Min.setText("");
                     T_Min_active=true;
                 } else{}
+            }
+        });
+        GOninclude.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame GenerateOptions = new JFrame();
+                F.setVisible(false);
+                GenerateOptions.getContentPane().setLayout(null);
+                GenerateOptions.setSize(500,163);
+                GenerateOptions.setVisible(true);
+                JPanel GenerateOptionsPanel = new JPanel();
+                JTextField GenerateOptionsTF = new JTextField();
+                GenerateOptionsTF.setVisible(true);
+                GenerateOptionsTF.setBounds(0,6,290,20);
+                GenerateOptionsTF.setColumns(30);
+                JButton GenerateOptionsnIncludeButton = new JButton();
+                GenerateOptionsnIncludeButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String GenerateDisabledFor = GenerateOptionsTF.getText();
+                        int MassiveNumberSTR = GenerateDisabledFor.length() - GenerateDisabledFor.replaceAll(",","").length();
+                        MassiveNumbers = MassiveNumberSTR + 1;
+                        GO_Used = true;
+                        System.out.println(MassiveNumbers);
+
+                        String[] DoNotGenerateSTR = GenerateDisabledFor.split(",");
+                        System.out.println(DoNotGenerateSTR);
+                        for (String DNGSTR_ready : DoNotGenerateSTR) {
+                            System.out.println(DNGSTR_ready);
+                        }
+                    }
+                });
+                GenerateOptionsnIncludeButton.setBounds(295, 5, 160, 23);
+                GenerateOptionsnIncludeButton.setText("Disable this numbers");
+                JLabel GO_DisableInstruction = new JLabel("Write comma-separated numbers that you want to disable");
+                GO_DisableInstruction.setBounds(65, 0, 400, 14);
+                GenerateOptions.getContentPane().add(GO_DisableInstruction);//, BorderLayout.NORTH);
+                GenerateOptionsPanel.setSize(500,163);
+                GenerateOptionsPanel.add(GenerateOptionsTF);
+                GenerateOptionsPanel.setLayout(null);
+                GenerateOptionsPanel.setBounds(5, 19, 495, 237);
+                GenerateOptionsPanel.add(GenerateOptionsnIncludeButton);
+                GenerateOptions.getContentPane().add(GenerateOptionsPanel,BorderLayout.CENTER);
+
+                JButton GO_Back = new JButton("Go back");
+                GO_Back.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent arg0) {
+                        GenerateOptions.setVisible(false);
+                        F.setVisible(true);
+                    }
+                });
+                GO_Back.setBounds(201, 37, 89, 23);
+                GenerateOptionsPanel.add(GO_Back);
             }
         });
         class UpdatePercent extends TimerTask {
